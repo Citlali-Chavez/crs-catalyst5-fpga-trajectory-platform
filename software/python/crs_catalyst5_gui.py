@@ -19,7 +19,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 PUERTO = 'COM12'
 BAUDIOS = 57600
-ID_CAMARA = 0  # Cambia a 1 si tu webcam tiene otro índice.
+ID_CAMARA = 0  # Set to 1 if your webcam uses a different device index.
 _proceso_camara = None
 
 fpga = None
@@ -68,11 +68,11 @@ def matriz_dh(theta, d, a, alpha):
 # ============================================================
 
 def calcular_transformaciones_dh(q_rad):
-    # Convertir ángulos absolutos (del controlador físico) a ángulos relativos (para DH)
+    # Convert absolute joint angles (from the physical controller) to DH-relative angles.
     theta_1 = q_rad[0]
     theta_2 = q_rad[1]
     theta_3 = q_rad[2] - q_rad[1]  # Restar el hombro al codo
-    theta_4 = q_rad[3] - q_rad[2]  # Restar el codo a la muñeca
+    theta_4 = q_rad[3] - q_rad[2]  # Subtract the elbow angle from the wrist angle.
     theta_5 = q_rad[4]
 
     dh_params = [
@@ -237,7 +237,7 @@ def actualizar_visor_3d(
     )
 
     # --------------------------------------------------------
-    # Dibujar trayectoria recorrida del TCP
+    # Draw the traversed TCP path.
     # --------------------------------------------------------
     if puntos_recorridos:
         posiciones_tcp = []
@@ -258,7 +258,7 @@ def actualizar_visor_3d(
                 linewidth=2,
                 marker='o',
                 markersize=5,
-                label='Trayectoria recorrida'
+                label='Traversed trajectory'
             )
         else:
             ax.scatter(
@@ -278,7 +278,7 @@ def actualizar_visor_3d(
             color='#fb7185',
             s=75,
             marker='o',
-            label='Posición actual'
+            label='Current position'
         )
 
         ax.legend(loc='upper left', fontsize=8, facecolor='#111c2f',
@@ -469,7 +469,7 @@ def _abrir_puerto_en_hilo():
             fpga.close()
             return
         encolar_envio("comando", "")  # conserva el CR inicial usado por el daemon
-        cola_entrada.put(("conexion_ok", f"Puerto {PUERTO} abierto."))
+        cola_entrada.put(("conexion_ok", f"Port {PUERTO} opened."))
     except Exception as exc:
         cola_entrada.put(("conexion_error", str(exc)))
 
@@ -509,7 +509,7 @@ def escuchar_robot_continuamente():
                 actualizar_consola_usuario(contenido)
             elif tipo == "conexion_error":
                 lbl_estado.config(text="Status: SERIAL PORT ERROR", fg="red")
-                actualizar_consola_usuario(f"ERROR DE PUERTO: {contenido}")
+                actualizar_consola_usuario(f"SERIAL PORT ERROR: {contenido}")
             elif tipo == "error":
                 ejecutando_trayectoria_real = False
                 actualizar_consola_usuario(contenido)
@@ -553,7 +553,7 @@ def despertar_robot():
 
 
 def comando_home():
-    actualizar_consola_usuario("\nTú: home")
+    actualizar_consola_usuario("\nYou: home")
     enviar_comando_serial("home")
     actualizar_visor_3d([0, np.pi / 2, 0, 0, 0])
 
@@ -561,7 +561,7 @@ def comando_home():
 def prueba_muescas_angulos():
     muescas_grados = [0.330, 91.000, 1.360, 1.194, 3.380]
     muescas_rad = np.deg2rad(muescas_grados).tolist()
-    actualizar_consola_usuario("\n--- PRUEBA MUESCAS POR ÁNGULOS ---")
+    actualizar_consola_usuario("\n--- HOME-MARK TEST USING JOINT ANGLES ---")
     actualizar_visor_3d(muescas_rad)
     enviar_angulos(muescas_rad)
 
@@ -573,7 +573,7 @@ def aplicar_velocidad_fisica(vel_porcentaje):
         actualizar_consola_usuario("Could not change the speed: the serial port is not connected.")
         return
     actualizar_consola_usuario(
-        f"\n--- Aplicando velocidad al robot ({int(vel_porcentaje)}%) ---"
+        f"\n--- Applying robot speed ({int(vel_porcentaje)}%) ---"
     )
     encolar_envio("velocidad", int(vel_porcentaje))
 
@@ -582,7 +582,7 @@ def al_soltar_barra_velocidad(event):
     global delay_simulacion
     vel = escala_velocidad.get()
     delay_simulacion = int(1000 - ((vel / 100.0) * 900))
-    actualizar_consola_usuario(f"\n[Velocidad de SIMULACIÓN ajustada a {vel}%]")
+    actualizar_consola_usuario(f"\n[SIMULATION speed set to {vel}%]")
 
     if ejecutando_trayectoria_real:
         actualizar_consola_usuario("Notice: a trajectory is in progress. Physical speed will be updated when it finishes.")
@@ -591,7 +591,7 @@ def al_soltar_barra_velocidad(event):
 
 
 # ============================================================
-# CARGAR TRAYECTORIA: COMAS, TABULADORES O ESPACIOS
+# LOAD TRAJECTORY: COMMAS, TABS, OR SPACES
 # ============================================================
 
 def parsear_fila_trayectoria(linea):
@@ -679,7 +679,7 @@ def animar_trayectoria():
     historial_simulacion = []
 
     actualizar_consola_usuario(
-        "\n--- ANIMACIÓN VIRTUAL INICIADA ---"
+        "\n--- VIRTUAL ANIMATION STARTED ---"
     )
 
     animar_punto(0)
@@ -690,7 +690,7 @@ def animar_punto(indice):
 
     if indice >= len(trayectoria):
         actualizar_consola_usuario(
-            "\n--- ANIMACIÓN VIRTUAL FINALIZADA ---"
+            "\n--- VIRTUAL ANIMATION FINISHED ---"
         )
 
         lbl_posicion.config(
@@ -707,7 +707,7 @@ def animar_punto(indice):
         punto,
         indice=indice + 1,
         total=len(trayectoria),
-        modo="Simulación virtual",
+        modo="Virtual simulation",
         puntos_recorridos=historial_simulacion
     )
 
@@ -737,7 +737,7 @@ def iniciar_ejecucion_real():
         return
 
     if ejecutando_trayectoria_real or _paro_solicitado.is_set():
-        actualizar_consola_usuario("Hay una trayectoria o una solicitud de aborto en curso.")
+        actualizar_consola_usuario("A trajectory is running or an abort request is pending.")
         return
 
     historial_fisica = []
@@ -774,7 +774,7 @@ def enviar_siguiente_punto_real():
 
     if indice_trayectoria_real >= len(trayectoria):
         actualizar_consola_usuario(
-            "\n===== TRAYECTORIA FÍSICA FINALIZADA ====="
+            "\n===== PHYSICAL TRAJECTORY COMPLETED ====="
         )
 
         ejecutando_trayectoria_real = False
@@ -782,15 +782,15 @@ def enviar_siguiente_punto_real():
         lbl_posicion.config(
             text=f"Mode: Physical execution completed | "
                  f"Confirmed points: {len(historial_fisica)} "
-                 f"de {len(trayectoria)}"
+                 f"of {len(trayectoria)}"
         )
         return
 
     punto_rad = trayectoria[indice_trayectoria_real]
 
     actualizar_consola_usuario(
-        f"\n--- Enviando Punto {indice_trayectoria_real + 1} "
-        f"de {len(trayectoria)} ---"
+        f"\n--- Sending point {indice_trayectoria_real + 1} "
+        f"of {len(trayectoria)} ---"
     )
 
     enviado = enviar_angulos(punto_rad)
@@ -813,7 +813,7 @@ def detener_ejecucion():
             cola_envio.task_done()
     except queue.Empty:
         pass
-    actualizar_consola_usuario("\n!!! ABORTO SOLICITADO: se cancela el envío de puntos. No sustituye el paro físico. !!!")
+    actualizar_consola_usuario("\n!!! ABORT REQUESTED: point transmission is cancelled. This does not replace the physical emergency stop. !!!")
     if fpga is None or not fpga.is_open:
         _paro_solicitado.clear()
         actualizar_consola_usuario("No serial connection is available to send Ctrl-C.")
@@ -828,7 +828,7 @@ def detener_ejecucion():
 def enviar_comando_manual(event=None):
     comando = entrada_comando.get().strip()
     if comando:
-        actualizar_consola_usuario(f"\nTú: {comando}")
+        actualizar_consola_usuario(f"\nYou: {comando}")
         enviar_comando_serial(comando)
         entrada_comando.delete(0, tk.END)
 
@@ -992,7 +992,7 @@ def mostrar_visor_camara(indice_camara=0):
 
     def detectar_camaras():
         boton_detectar.config(state="disabled", text="Buscando…")
-        estado.config(text="Buscando dispositivos 0–9…", fg="#fbbf24")
+        estado.config(text="Searching for devices 0–9…", fg="#fbbf24")
 
         def buscar():
             try:
@@ -1082,7 +1082,7 @@ if __name__ == "__main__" and len(sys.argv) >= 2 and sys.argv[1] == "--camera":
 # ============================================================
 
 ventana = tk.Tk()
-ventana.title("CRS Catalyst 5 | Control y simulación")
+ventana.title("CRS CataLyst-5 | Control and Simulation")
 ventana.geometry("1180x760")
 ventana.minsize(980, 620)
 ventana.configure(bg="#0b1220")
@@ -1172,7 +1172,7 @@ ttk.Button(frame_botones, text="Execute on robot", style="Primary.TButton",
 ttk.Button(frame_botones, text="STOP / ABORT", style="Danger.TButton",
            command=detener_ejecucion).grid(row=3, column=1, sticky="ew", padx=(5, 0), pady=3)
 
-# Velocidad.
+# Speed.
 card_velocidad = ttk.Frame(frame_izq, style="Card.TFrame", padding=(0, 5, 0, 4))
 card_velocidad.grid(row=2, column=0, sticky="ew", pady=(2, 0))
 card_velocidad.grid_columnconfigure(1, weight=1)
@@ -1185,7 +1185,7 @@ escala_velocidad.grid(row=1, column=1, sticky="ew", padx=5)
 ttk.Label(card_velocidad, text="100%", style="Card.TLabel").grid(row=1, column=2, padx=(8, 0))
 escala_velocidad.bind("<ButtonRelease-1>", al_soltar_barra_velocidad)
 
-# Consola y comando manual.
+# Serial console and manual command input.
 ttk.Label(frame_izq, text="SERIAL CONSOLE", style="Section.TLabel").grid(
     row=3, column=0, sticky="sw", pady=(5, 3))
 consola = tk.Text(frame_izq, height=7, bg="#07101d", fg="#86efac",
