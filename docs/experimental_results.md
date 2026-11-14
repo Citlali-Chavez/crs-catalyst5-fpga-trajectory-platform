@@ -1,23 +1,28 @@
-# Evaluación experimental y resultados
+# Experimental evaluation and results
 
-La tesis reporta tres casos de estudio:
+The thesis reports three study cases:
 
-1. Operación nativa del manipulador mediante Teach Pendant y ROBCOMM3.
-2. Diez ensayos de retorno a la posición MUESCAS (HOME) desde distintas configuraciones articulares.
-3. Ejecución de una trayectoria compuesta por veinte configuraciones articulares consecutivas.
+1. Native manipulator operation using the Teach Pendant and ROBCOMM3.
+2. Ten return tests to the MUESCAS (HOME) position from different joint configurations.
+3. Execution of a trajectory consisting of twenty consecutive joint configurations.
 
-## Resultados reportados
+## Reported results
 
-- En los diez retornos a HOME se obtuvieron las mismas lecturas enteras de pulsos para las cinco articulaciones y se observó visualmente la alineación de las marcas físicas de referencia.
-- La trayectoria de veinte puntos se ejecutó mediante transmisión secuencial de las configuraciones y recepción de respuestas de confirmación del controlador.
-- El diseño digital reportó 83 ALMs y un bloque de memoria M10K.
+- In the ten returns to HOME, the same integer pulse readings were obtained for the five joints, and the physical reference marks were visually observed to be aligned.
+- The twenty-point trajectory was executed through sequential transmission of the configurations and reception of controller acknowledgement responses.
+- The digital design report lists 83 adaptive logic modules (ALMs) and one M10K memory block.
 
-## Interpretación y limitaciones
+## Interpretation and limitations
 
-Los resultados respaldan la viabilidad funcional de la integración entre la aplicación, la FPGA y el controlador original. Sin embargo, la tesis señala que la precisión de posicionamiento y la repetibilidad mecánica requieren mediciones independientes adicionales.
+These results support the functional feasibility of integrating the host application, FPGA communication interface, and original robot controller. However, the thesis indicates that positioning accuracy and mechanical repeatability require additional independent measurements.
 
-Por tanto, los diez retornos no deben presentarse como una medición metrológica independiente de repetibilidad, ni las pruebas descritas como una caracterización completa de precisión.
+Therefore, the ten return tests must not be presented as an independent metrological measurement of mechanical repeatability. Likewise, the reported tests do not constitute a complete characterization of positioning accuracy.
 
-## Evidencia
+## Evidence available in this repository
 
-Los registros, fotografías, videos, reportes y datos originales podrán incorporarse en `results/` y `media/` una vez seleccionados y revisados por la autora.
+- [Robot and system photographs](../media/images/)
+- [Trajectory visualization and experimental captures](../media/images/)
+- [Execution video: nine-point sequence](../media/robot_execution/nine_point_trajectory.mp4)
+- [FPGA resource and implementation evidence](../hardware/evidence/)
+
+The repository contains the available evidence files supplied with the project archive. The MUESCAS video was present in the supplied ZIP archive but is not currently present as a standalone file in the connected GitHub repository; it must be uploaded separately before it can be linked here.
