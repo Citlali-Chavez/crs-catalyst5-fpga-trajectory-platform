@@ -1,31 +1,43 @@
-# Diseño de hardware digital
+# Digital hardware design
 
-## Plataforma FPGA
+## FPGA platform
 
-- Familia: Intel Cyclone V GX.
-- Número de parte indicado en la tesis: 5CGXFC5C6F27C7N.
-- Lenguaje de descripción: Verilog.
+- FPGA family: Intel Cyclone V GX.
+- Device part number reported in the thesis: 5CGXFC5C6F27C7N.
+- Hardware description language: Verilog.
 
-## Arquitectura lógica
+## Digital architecture
 
-El diseño integra módulos UART de recepción y transmisión, una memoria FIFO y una máquina de estados. En conjunto, estos bloques permiten recibir datos, almacenarlos temporalmente y retransmitirlos hacia el controlador C500C.
+The design integrates UART reception and transmission modules, a FIFO memory and a finite-state machine (FSM).
 
-## Interfaz eléctrica
+- **UART RX:** receives command data from the computer through the USB-to-TTL adapter.
+- **FIFO:** temporarily stores the received data.
+- **FSM:** coordinates the data transfer and transmission sequence.
+- **UART TX:** transmits the command data toward the MAX3232-based electrical interface and the C500C controller.
 
-La tesis reporta adaptación de niveles eléctricos mediante un circuito MAX3232 para la comunicación serial con el controlador. La velocidad nominal indicada es 57,600 baudios.
+The C500C response path returns to the computer through the MAX3232 and USB-to-TTL adapter. It does not pass through the FPGA.
 
-## Recursos reportados
+## Electrical interface and serial settings
 
-La implementación identificada como BLOQUE_COMPLETO reporta 83 módulos lógicos adaptativos (ALM) y un bloque de memoria M10K.
+The thesis reports a MAX3232-based electrical level adaptation stage between the FPGA transmit channel and the C500C serial console interface. The nominal serial rate is 57,600 baud.
 
-## Archivos pendientes
+The exact pin mapping, connector wiring, UART frame configuration and electrical measurements should be documented from the original schematic and test records before hardware reproduction.
 
-Añadir aquí, cuando estén preparados para publicación:
+## Reported FPGA resources
 
-- Código Verilog y módulos de nivel superior.
-- Testbenches y resultados de simulación.
-- Proyecto y restricciones de pines del FPGA.
-- Reportes de síntesis y compilación.
-- Esquemáticos de interfaz y documentación de conexiones.
+The implementation identified as BLOQUE_COMPLETO reports:
 
-No se incluyen archivos HDL ficticios en el scaffold.
+- 83 adaptive logic modules (ALMs).
+- One M10K memory block.
+
+These values should be accompanied by the original synthesis report when it is added to the repository.
+
+## Files to add when prepared for publication
+
+- Verilog source files and top-level module.
+- Testbenches and simulation results.
+- FPGA project files and pin assignments.
+- Synthesis and compilation reports.
+- Electrical interface schematic and wiring documentation.
+
+No HDL source files are fabricated or included in this documentation scaffold.
