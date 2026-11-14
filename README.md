@@ -97,6 +97,7 @@ These results support **functional integration and execution feasibility**. They
 ├── CITATION.cff
 ├── CONTRIBUTING.md
 ├── docs/
+│   ├── diagrams/architecture_diagram.tex
 │   ├── project_overview.md
 │   ├── system_architecture.md
 │   ├── software_design.md
