@@ -1,23 +1,34 @@
-# Diseño de software
+# Software design
 
-## Aplicación anfitriona
+## Host application
 
-La tesis describe una aplicación desarrollada en Python con interfaz gráfica y visualización tridimensional. Se emplean Tkinter para la interfaz, Matplotlib para la representación gráfica y PySerial para la comunicación serial.
+The thesis describes a Python application that provides a graphical interface, three-dimensional robot visualization and serial communication. The documented technologies are:
 
-## Funciones documentadas
+- **Tkinter:** graphical user interface.
+- **Matplotlib:** three-dimensional visualization.
+- **PySerial:** serial communication with the USB-to-TTL adapter.
 
-- Selección y carga de archivos TXT y CSV.
-- Lectura de configuraciones articulares q1, q2, q3, q4 y q5.
-- Validación de filas con cinco valores numéricos.
-- Interpretación de los valores de entrada en radianes.
-- Conservación del orden original de los puntos.
-- Visualización tridimensional basada en cinemática directa.
-- Coordinación de la transmisión secuencial hacia el robot.
+## Documented responsibilities
 
-## Límites
+- Select and load the CSV trajectory file generated externally.
+- Read ordered joint configurations q1, q2, q3, q4 and q5.
+- Validate that each accepted configuration contains five numerical values.
+- Interpret joint values in radians.
+- Preserve the order of the trajectory points.
+- Display robot configurations using forward kinematics.
+- Coordinate sequential command transmission and physical execution.
+- Receive controller responses directly through the computer-side serial adapter and use them to coordinate progression through the sequence.
 
-La planificación y el cálculo de la trayectoria se consideran procesos externos. La aplicación se encarga de leer, validar, organizar, visualizar y gestionar la ejecución de la secuencia.
+## Relationship with the FPGA
 
-## Código fuente
+The computer sends command data to the FPGA through the USB-to-TTL adapter. The FPGA processes the incoming stream and retransmits it to the C500C through the MAX3232 interface.
 
-El código original aún no está incluido en este paquete. Añádelo en este directorio después de revisar dependencias, credenciales, rutas locales y derechos de publicación.
+The controller's responses return to the computer through the MAX3232 and USB-to-TTL adapter, bypassing the FPGA. The Python application coordinates the execution sequence using these responses.
+
+## Scope
+
+Trajectory generation and planning are external to the platform. The host application loads, validates, organizes and visualizes the trajectory and manages its sequential execution.
+
+## Source code
+
+The original Python source code is not included in this repository yet. Add it after reviewing dependencies, local paths, credentials and publication rights. Include a dependency file (for example, `requirements.txt`) and instructions for configuring the serial port when the source is added.
