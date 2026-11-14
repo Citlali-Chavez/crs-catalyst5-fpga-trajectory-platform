@@ -109,16 +109,6 @@ This repository currently contains project documentation and directory placehold
 
 This repository documents a research platform connected to an industrial robot. Do not connect, power, or command the manipulator based only on this documentation. Before any physical test, verify the robot/controller manuals, wiring, electrical levels, emergency-stop circuit, workspace clearance, joint limits, communication settings and supervision procedures. Use the robot only under appropriate laboratory safety procedures.
 
-## Thesis information
-
-**Title:** *Desarrollo de una plataforma para la ejecución de trayectorias de un robot articulado de 5 DOF implementado en FPGA*  
-**Author:** Gloria Citlali Chávez Flores  
-**Degree:** Maestría en Ciencias en la Especialidad de Electrónica  
-**Institution:** Instituto Nacional de Astrofísica, Óptica y Electrónica (INAOE)  
-**Location and date:** Santa María Tonantzintla, Puebla, November 2026  
-**Supervisors:** Dr. Luis Hernández Martínez and Dr. Gerardo Ulises Díaz Arango
-
-The thesis grants INAOE permission to reproduce and distribute copies of the thesis. That statement does **not** establish an open-source license for the software or HDL in this repository. No software license is assigned in this initial scaffold. A license should be added only after the author has confirmed the applicable rights and chosen the intended terms.
 
 ## Documentation
 
