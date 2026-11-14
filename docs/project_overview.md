@@ -1,20 +1,20 @@
-# Descripción general del proyecto
+# Project overview
 
-## Propósito
+## Purpose
 
-La investigación desarrolla y evalúa funcionalmente una plataforma para gestionar la ejecución de trayectorias articulares en el manipulador CRS CataLyst-5 de cinco grados de libertad. La solución integra una aplicación en Python, un subsistema de comunicación implementado en una FPGA Intel Cyclone V GX y el controlador original C500C del robot.
+This research develops and functionally evaluates a platform for managing joint-space trajectory execution on the five-degree-of-freedom CRS CataLyst-5 manipulator. The system integrates a Python application, a communication subsystem implemented on an Intel Cyclone V GX FPGA, and the robot's original C500C controller.
 
-## Alcance funcional
+## Functional scope
 
-La aplicación permite cargar secuencias articulares desde archivos TXT y CSV, visualizar posturas mediante un modelo tridimensional basado en cinemática directa y coordinar el envío secuencial de instrucciones al controlador.
+The Python application loads a CSV file containing an ordered sequence of joint configurations, visualizes robot postures through a three-dimensional model based on forward kinematics, and coordinates sequential command transmission and execution.
 
-El subsistema FPGA recibe datos, los almacena temporalmente mediante una FIFO y los retransmite al C500C. Las respuestas del controlador se reciben en la computadora y se utilizan para coordinar el envío de los puntos.
+The FPGA receives command data from the computer through a USB-to-TTL adapter, temporarily stores it in a FIFO, and retransmits it to the C500C through a MAX3232-based electrical interface. Responses from the C500C return directly to the computer through the MAX3232 and USB-to-TTL adapter; this response path does not pass through the FPGA.
 
-## Qué no pretende hacer
+## What the platform does not claim
 
-- No sustituye el controlador original C500C.
-- No implementa una nueva ley de control del movimiento.
-- No genera ni planifica automáticamente las trayectorias.
-- No demuestra por sí sola la precisión absoluta ni la repetibilidad mecánica del robot.
+- It does not replace the original C500C controller.
+- It does not implement a new robot motion-control law.
+- It does not autonomously generate or plan trajectories.
+- It does not, by itself, establish absolute positioning accuracy or mechanical repeatability.
 
-Las trayectorias se consideran previamente generadas. Cada configuración está formada por cinco valores numéricos, correspondientes a q1–q5, expresados en radianes.
+The trajectory is generated externally and supplied as a CSV file. Each configuration contains five numerical joint values, q1–q5, expressed in radians.
