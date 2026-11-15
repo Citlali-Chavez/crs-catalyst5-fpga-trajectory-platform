@@ -1,6 +1,6 @@
 cff-version: 1.2.0
-message: "If you use or refer to this research platform, please cite the Master's thesis."
-title: "Desarrollo de una plataforma para la ejecución de trayectorias de un robot articulado de 5 DOF implementado en FPGA"
+message: "If you use or refer to this research platform, please cite the associated Master's thesis."
+title: "Development of a Platform for Trajectory Execution of a 5-DOF Articulated Robot Implemented on an FPGA"
 authors:
   - family-names: "Chávez Flores"
     given-names: "Gloria Citlali"

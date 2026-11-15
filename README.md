@@ -1,79 +1,43 @@
 # CRS CataLyst-5 FPGA Trajectory Execution Platform
 
-**A computer-based platform for loading, visualizing and executing joint-space trajectories on a five-degree-of-freedom CRS CataLyst-5 manipulator.**
+A computer-based platform for loading, visualizing, and executing joint-space trajectories on a five-degree-of-freedom CRS CataLyst-5 manipulator.
 
-[![Robot](https://img.shields.io/badge/robot-CRS%20CataLyst--5-informational)]()
-[![FPGA](https://img.shields.io/badge/FPGA-Intel%20Cyclone%20V%20GX-blue)]()
-[![HDL](https://img.shields.io/badge/HDL-Verilog-purple)]()
-[![Software](https://img.shields.io/badge/software-Python-yellow)]()
-[![Status](https://img.shields.io/badge/status-research%20prototype-lightgrey)]()
+![CRS CataLyst-5 robot](media/images/crs_catalyst5_robot.jpg)
 
-> This repository documents a research platform developed as part of a Master's thesis at the Instituto Nacional de Astrofísica, Óptica y Electrónica (INAOE). Original source code, FPGA project files and experimental media will be added after they have been reviewed and prepared for publication.
+![Python application](media/images/python_gui.png)
 
-## Overview
+## Project overview
 
-The platform integrates a Python application, an FPGA-based communication interface and the original CRS C500C robot controller.
+This research platform integrates a Python desktop application, an Intel Cyclone V GX FPGA communication interface, an electrical level-adaptation stage, and the original CRS C500C robot controller.
 
-1. **Python application:** loads a CSV file containing an ordered sequence of five joint variables, visualizes the manipulator in 3D using forward kinematics, and coordinates the sequential execution of the trajectory.
-2. **FPGA communication interface:** implemented in Verilog on an Intel Cyclone V GX. Its UART receiver accepts data from the computer through a USB-to-TTL adapter; a FIFO temporarily stores the data; and a finite-state machine coordinates transmission through the FPGA UART transmitter.
-3. **Electrical interface and robot controller:** a MAX3232-based level adapter connects the FPGA transmit channel to the console interface of the original CRS C500C controller. The controller retains its internal robot motion-control functions.
+- **Host application:** loads externally generated CSV trajectories, visualizes robot configurations in 3D using forward kinematics, and coordinates sequential execution.
+- **FPGA interface:** Verilog modules implement UART reception, temporary data storage, state-machine coordination, and UART transmission.
+- **Electrical interface:** a MAX3232-based stage connects the FPGA transmit path to the C500C serial console.
+- **Robot controller:** the original C500C retains the robot's native motion-control functions.
 
-The controller's responses return to the computer through the MAX3232 and the USB-to-TTL adapter. **This return path bypasses the FPGA.** The Python application uses the responses to coordinate the sequential transmission of trajectory points and the corresponding 3D/physical execution.
+The controller response path returns to the computer through the MAX3232 and a USB-to-TTL adapter. It bypasses the FPGA. This platform does not replace the C500C, implement a new motion-control law, or autonomously plan trajectories.
 
-The platform manages the execution of externally generated joint sequences. It does **not** implement a new motion-control law or an autonomous trajectory planner.
-
-## System architecture
-
-The command and response paths are intentionally shown separately:
+## Architecture
 
 ```mermaid
 flowchart LR
-    CSV["CSV trajectory\n(q1, q2, q3, q4, q5)"] --> PC["Computer\nPython API + 3D visualization"]
-    PC -->|"Commands / trajectory data"| USB["USB-to-TTL adapter"]
-    USB -->|"TTL data"| FPGA["FPGA · Cyclone V GX\nUART RX · FIFO · FSM · UART TX"]
-    FPGA -->|"UART TX"| MAX["MAX3232 level adaptation"]
-    MAX -->|"RS-232 console link"| C500C["Original CRS C500C controller"]
-    C500C --> ROBOT["CRS CataLyst-5\n5-DOF articulated robot"]
-    C500C -.->|"Controller response (TX)"| MAX
-    MAX -.->|"RS-232 to TTL"| USB
-    USB -.->|"USB serial RX"| PC
+    CSV["CSV trajectory<br/>(q1...q5, radians)"] --> PC["Computer<br/>Python GUI + 3D model"]
+    PC --> USB["USB-to-TTL adapter"]
+    USB --> RX["FPGA UART RX"]
+    RX --> FIFO["FIFO"]
+    FIFO --> FSM["Control FSM"]
+    FSM --> TX["FPGA UART TX"]
+    TX --> MAX["MAX3232"]
+    MAX --> C500C["CRS C500C controller"]
+    C500C --> ROBOT["CRS CataLyst-5"]
+    C500C -.-> MAX
+    MAX -.-> USB
+    USB -.-> PC
 ```
 
-- **Forward command path:** Python application → USB-to-TTL → FPGA UART RX → FIFO/FSM → FPGA UART TX → MAX3232 → C500C.
-- **Return response path:** C500C TX → MAX3232 → USB-to-TTL RX → computer/Python application. The response does not pass through the FPGA.
-- **Robot actuation:** the original C500C controller drives the CRS CataLyst-5 robot.
+The dashed return path represents controller responses to the computer and does not pass through the FPGA.
 
-A source diagram is also provided in [TikZ format](docs/diagrams/architecture_diagram.tex). The Mermaid diagram above is rendered directly by GitHub.
-
-## Main technical characteristics
-
-| Item | Description |
-|---|---|
-| Robot | CRS CataLyst-5, 5 degrees of freedom |
-| Robot controller | Original CRS C500C |
-| Host application | Python |
-| GUI / visualization | Tkinter and Matplotlib |
-| Serial software interface | PySerial |
-| FPGA family | Intel Cyclone V GX |
-| FPGA part | 5CGXFC5C6F27C7N |
-| HDL | Verilog |
-| FPGA communication blocks | UART RX, UART TX, FIFO and FSM |
-| Nominal serial rate | 57,600 baud |
-| Electrical adaptation | MAX3232 |
-| Trajectory input documented here | CSV |
-| Joint variables | q1, q2, q3, q4, q5 |
-| Input units | Radians |
-| FPGA resource result | 83 ALMs and one M10K block |
-
-## Experimental results reported in the thesis
-
-- Ten returns to the MUESCAS (HOME) reference position were carried out from different joint configurations. The same integer pulse readings were obtained for the five joints, and physical alignment of the reference marks was visually observed.
-- A trajectory consisting of twenty consecutive joint configurations was executed using sequential transmission and controller acknowledgements.
-- The implementation was reported to use 83 adaptive logic modules (ALMs) and one M10K memory block.
-
-These results support **functional integration and execution feasibility**. They should not be interpreted as an independent measurement of positioning accuracy or mechanical repeatability; those measurements require additional instrumentation and experimental characterization.
-
-## Repository structure
+## Repository layout
 
 ```text
 .
@@ -81,37 +45,61 @@ These results support **functional integration and execution feasibility**. They
 ├── CITATION.cff
 ├── CONTRIBUTING.md
 ├── docs/
-│   ├── diagrams/
-│   │   ├── architecture_diagram.md
-│   │   └── architecture_diagram.tex
-│   ├── project_overview.md
-│   ├── system_architecture.md
-│   ├── software_design.md
-│   ├── hardware_design.md
-│   ├── trajectory_format.md
-│   └── experimental_results.md
-├── hardware/
 ├── software/
+│   ├── python/
+│   └── requirements.txt
+├── hardware/
+│   ├── verilog/
+│   │   ├── uart_rx/
+│   │   ├── uart_tx/
+│   │   └── fifo/
+│   ├── quartus/
+│   ├── source_documents/
+│   └── evidence/
 ├── trajectory_examples/
 ├── media/
-│   ├── architecture/
-│   ├── hardware/
-│   ├── simulation/
+│   ├── images/
 │   └── robot_execution/
 └── results/
 ```
 
-## Current repository contents
+## Main technical characteristics
 
-This repository currently contains project documentation and directory placeholders. The original Python source, Verilog source, FPGA project files, trajectory datasets, photographs and videos are not included yet. They should be added by the author after review and preparation for publication.
+| Item | Description |
+|---|---|
+| Robot | CRS CataLyst-5, 5 DOF |
+| Controller | Original CRS C500C |
+| Host software | Python, Tkinter, Matplotlib, PySerial |
+| FPGA | Intel Cyclone V GX, 5CGXFC5C6F27C7N |
+| HDL | Verilog |
+| Digital blocks | UART RX, FIFO, FSM, UART TX |
+| Nominal serial rate | 57,600 baud |
+| Electrical interface | MAX3232 |
+| Trajectory variables | q1, q2, q3, q4, q5 |
+| Trajectory units | Radians |
 
-## Safety and scope
+## Experimental results
 
-This repository documents a research platform connected to an industrial robot. Do not connect, power, or command the manipulator based only on this documentation. Before any physical test, verify the robot/controller manuals, wiring, electrical levels, emergency-stop circuit, workspace clearance, joint limits, communication settings and supervision procedures. Use the robot only under appropriate laboratory safety procedures.
-
+The thesis reports ten returns to the MUESCAS (HOME) reference position, execution of a 20-configuration joint trajectory with controller acknowledgements, and FPGA resource use of 83 ALMs and one M10K block. These results support functional integration and execution feasibility; they are not an independent metrological characterization of positioning accuracy or mechanical repeatability. See [experimental results](docs/experimental_results.md).
 
 ## Documentation
 
-The technical documentation is available in [`docs/`](docs/). The repository is maintained primarily in English for international accessibility; the thesis and supporting technical records may be in Spanish.
+- [Project overview](docs/project_overview.md)
+- [System architecture](docs/system_architecture.md)
+- [Software design](docs/software_design.md)
+- [Hardware design](docs/hardware_design.md)
+- [Trajectory CSV format](docs/trajectory_format.md)
+- [Experimental results](docs/experimental_results.md)
+- [Architecture diagram source](docs/diagrams/architecture_diagram.tex)
 
----
+## Running the host application
+
+See [software/README.md](software/README.md) for setup and execution instructions. The supplied script retains hardware-specific command sequences and a default serial port setting that must be checked before use.
+
+## Safety notice
+
+This repository documents a research platform connected to an industrial robot. Do not power or command the manipulator based only on this README. Verify wiring, electrical levels, controller state, emergency-stop arrangements, joint limits, workspace clearance, and laboratory supervision procedures before any physical test.
+
+## Citation and licensing
+
+See [CITATION.cff](CITATION.cff) for citation metadata. No open-source license is asserted here; publication and redistribution rights must be confirmed by the author before selecting a license.
